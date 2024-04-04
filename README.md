@@ -1,7 +1,7 @@
 
 # AQI Prediction Server
 
-![AQI Prediction Server](https://your-image-url-here)
+![AQI Prediction Server](Airqualityprediction/statics/Screenshot (17).png)
 
 ## Introduction
 
