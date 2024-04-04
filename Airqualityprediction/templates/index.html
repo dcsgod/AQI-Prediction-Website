@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict AQI</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #aqiResult {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Predict AQI</h1>
+        <form id="aqiForm" action="/predict" method="post">
+            <div class="form-group">
+                <label for="pm25">PM2.5:</label>
+                <input type="number" id="pm25" name="pm25" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="pm10">PM10:</label>
+                <input type="number" id="pm10" name="pm10" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="no">NO:</label>
+                <input type="number" id="no" name="no" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="no2">NO2:</label>
+                <input type="number" id="no2" name="no2" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="co">CO:</label>
+                <input type="number" id="co" name="co" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="so2">SO2:</label>
+                <input type="number" id="so2" name="so2" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="o3">O3:</label>
+                <input type="number" id="o3" name="o3" class="form-control" required>
+            </div>
+            <input type="submit" value="Predict" class="btn btn-primary btn-lg">
+        </form>
+        <div id="aqiResult" style="display: none;"></div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById("aqiForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var form = this;
+            var formData = new FormData(form);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/predict", true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var result = JSON.parse(xhr.responseText);
+                    var aqiResultElement = document.getElementById("aqiResult");
+                    aqiResultElement.textContent = "Predicted AQI: " + result.prediction.toFixed(2);
+                    aqiResultElement.style.display = "block";
+
+                    // Change background color based on AQI value
+                    var aqiValue = result.prediction;
+                    if (aqiValue <= 50) {
+                        document.body.style.backgroundColor = "#1abc9c"; // Good (Green)
+                    } else if (aqiValue <= 100) {
+                        document.body.style.backgroundColor = "#f1c40f"; // Moderate (Yellow)
+                    } else if (aqiValue <= 150) {
+                        document.body.style.backgroundColor = "#e67e22"; // Unhealthy for Sensitive Groups (Orange)
+                    } else if (aqiValue <= 200) {
+                        document.body.style.backgroundColor = "#e74c3c"; // Unhealthy (Red)
+                    } else if (aqiValue <= 300) {
+                        document.body.style.backgroundColor = "#9b59b6"; // Very Unhealthy (Purple)
+                    } else {
+                        document.body.style.backgroundColor = "#3498db"; // Hazardous (Blue)
+                    }
+                }
+            };
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send(new URLSearchParams(formData).toString());
+        });
+    </script>
+</body>
+</html>
